@@ -6,10 +6,11 @@ import random
 import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.layers as layers
-
+import sys
 import dqn
 from dqn_utils import *
 from atari_wrappers import *
+import time
 
 
 def atari_model(img_in, num_actions, scope, reuse=False):
@@ -74,7 +75,8 @@ def atari_learn(env,
         learning_freq=4,
         frame_history_len=4,
         target_update_freq=10000,
-        grad_norm_clipping=10
+        grad_norm_clipping=10,
+        double_q_learning=False
     )
     env.close()
 
@@ -124,7 +126,11 @@ def main():
     task = benchmark.tasks[3]
 
     # Run training
-    seed = 0 # Use a seed of zero (you may want to randomize the seed!)
+    if len(sys.argv) > 1:
+        seed = int(sys.argv[1])
+    else:
+        seed = int(time.time()) # Use a seed of zero (you may want to randomize the seed!)
+    print("Seed: "+str(seed))
     env = get_env(task, seed)
     session = get_session()
     atari_learn(env, session, num_timesteps=task.max_timesteps)
